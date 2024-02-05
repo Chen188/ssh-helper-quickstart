@@ -128,6 +128,7 @@ create_iam_role() {
     "Version": "2012-10-17",
     "Statement": [
         {
+            "Sid": "S3",
             "Effect": "Allow",
             "Action": [
                 "s3:GetObject",
@@ -137,6 +138,27 @@ create_iam_role() {
             ],
             "Resource": [
                 "arn:aws:s3:::*"
+            ]
+        },
+        {
+            "Sid": "KMS",
+            "Effect": "Allow",
+            "Action": [
+                "kms:GenerateDataKey",
+                "kms:Decrypt"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Sid": "SSM",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:StartSession"
+            ],
+            "Resource": [
+                "*"
             ]
         }
     ]
