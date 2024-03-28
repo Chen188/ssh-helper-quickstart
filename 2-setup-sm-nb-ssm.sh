@@ -8,13 +8,17 @@ set -e
 
 CURRENT_REGION=$(aws configure get region || echo "$AWS_REGION")
 
-if [! -f /tmp/ssm/ssm-setup-cli]; then
+if [ ! -f /tmp/ssm/ssm-setup-cli ]; then
+    mkdir -p /tmp/ssm/
     curl https://amazon-ssm-$CURRENT_REGION.s3.$CURRENT_REGION.amazonaws.com/latest/linux_amd64/ssm-setup-cli -o /tmp/ssm/ssm-setup-cli
 fi
 
 sudo chmod +x /tmp/ssm/ssm-setup-cli
 
-SSH_SSM_ROLE='service-role/AmazonEC2RunCommandRoleForManagedInstances'
+if [ -z $SSH_SSM_ROLE ]; then
+    # Set to Notebook Instance Role, if not provided by user
+    SSH_SSM_ROLE=$(aws sts get-caller-identity | jq --raw-output '.Arn' | awk -F/ '{print $2}')
+fi
 
 if [ -f /opt/ml/metadata/resource-metadata.json ]; then
   # SageMaker Studio and notebook instances
